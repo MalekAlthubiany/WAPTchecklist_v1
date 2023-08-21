@@ -1,0 +1,52 @@
+Recon web application: 
+
+Recon process is the first step of the WAPT process, it is essential and important. It gives hints and open door for
+further explotation and valuable inforamtion. 
+
+------------------------------
+1. Identify the scope, and detect the services, servers name, origin.. 
+example: so you can a bigger picture of the scope
+tools: wappalyzer/burpsuite
+reason: to save time and proper crawlings/wordlist. 
+------------------------------
+2. Automated Subdomain enumration. 
+example:
+ 1. nuclei -ut && nuclei -target "ip"
+ 2. subfinder -d malek.com -silent | httpx -asn
+ 3. subfinder -dL subodmains.txt | httpx 
+ 4. amass enum -passive -norecursive -noalts -df list-domains.txt -o subs.txt 
+ 5. cat subs.txt | httpx -o live-subs.txt
+ 6. cat subs.txt | httprobe -p http:81 -p http:3000 -p https:3000 -p http:3001 -p https:3001 -p http:8000 -p http:8080 -p https:8443 -p https:10000 -p http:9000 -p https:9443 -c 50 | tee live-subs2.txt
+ 7. python altdns.py -i icann.domains -o data_output -w icann.words -r -s results_output.txt  
+tools: subfinder/knockpy/amass/nuclei/virustotal/DNSDumpster/aldtdns
+reason: finding senestive vurnbale domains
+moreinfo: https://orwaatyat.medium.com/how-i-found-multiple-bugs-on-facebook-in-1-month-and-a-part-for-my-methodology-tools-58a677a9040c
+-------------------------------
+3. enumerate alive subs 
+example: cat subs.txt | httpx -title -status-code -content-length -follow-redirects 
+tools: httpx github
+reason: This will run the tool against all the hosts and subdomains in hosts.txt and returns URLs running HTTP webserver.
+-------------------------------
+4. Manual/passive Subdomain enumration
+example:
+ 1. "copyright footer @2016 by Malekcompany" -Targetwebsite >>> in a google search 
+ 2. site: target.com 
+tools: googledorks/shodan/waybackmachine/Virustotal
+reason: Findings interestings domains related with this keywords. Old domains could be found.
+-------------------------------
+5. Certificate check
+exmaple: 
+ 1.Check the certifcate manually 
+ 3. go to whois.cgi 
+ 2. then nmap --script targets-asn --script-args targets-asn.asn=17012 "target"
+tools:  crt.sh/certificate/nmap/whois.cgi
+reason: if it's SSL certificates it has Subject alternative names which has more subdomain of the target, you may find something. 
+-------------------------------
+Valuable resources: 
+1. https://orwaatyat.medium.com/how-i-found-multiple-bugs-on-facebook-in-1-month-and-a-part-for-my-methodology-tools-58a677a9040c
+2. https://blog.appsecco.com/a-penetration-testers-guide-to-sub-domain-enumeration-7d842d5570f6
+3. https://www.ceeyu.io/resources/blog/subdomain-enumeration-tools-and-techniques
+4. https://asn.cymru.com/cgi-bin/whois.cgi 
+5. https://sidxparab.gitbook.io/subdomain-enumeration-guide/passive-enumeration/passive-sources
+6. https://medium.com/@fath3ad.22/passive-active-information-gathering-subdomain-enumeration-e5538c3d3ecc
+-------------------------------
